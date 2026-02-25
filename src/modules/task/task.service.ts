@@ -1,42 +1,54 @@
-import { Injectable } from '@nestjs/common';
-
-export interface Task {
-  id: number;
-  title: string;
-}
+import { Inject, Injectable } from '@nestjs/common';
+import { ConnectConfig } from 'rxjs';
+import { CreateTaskDto } from 'src/modules/auth/dto/create-task.dto';
 
 @Injectable()
 export class TaskService {
-  private tasks: Task[] = [];
 
-  public getTask(): Task[] {
-    return this.tasks;
-  }
+    constructor(
+        @Inject('MYSQL_CONNECTION') private db: any
+    ) { }
 
-  public getTaskById(id: number): string {
-    return `Tarea con el id ${id}`;
-  }
+    private task: any[] = [];
 
-  public insert(task: Task): Task {
-    this.tasks.push(task {
-      ...task,
-      id: this.tasks.length + 1
+    public async getTask(): Promise<any> {
+        const query = 'SELECT * FROM task';
+        const [result]: any = await this.db.query(query);
+
+        return result;
     }
-    return task;
-  }
 
-  public update(id: number, task: Task): Task {
-    const index = this.tasks.map(t => {
-    if (t.id == id) {
-      if (task.name) t.name = task.name;
-      }
+    public async getTaskById(id: number): Promise<any> {
+        const query = 'SELECT * FROM task WHERE id='${ id }'';
+        const [result] = await this.db.query(query)
+        return [0]
+
+
     }
-    return t;
 
-  }
+    public async insert(tasks: CreateTaskDto): Promise<any> {
+          //Agregar el query
+    const sql= 'INSERT INTO tasks VALUES(name, description, priority, user_id)' VALUES ('${task.name}', '${task.description}', '${task.priority}', '${task.id}')
+    const [result]=await this.getTaskById.query(sql);
+    const inserid = result.insertid;
+    const row = await this.getTaskById(insertid):
+    return row;
 
-  public delete(id: number): string {
-    this.tasks = this.tasks.filter((task) => task.id !== id);
-    return `Tarea con el id ${id} eliminada`;
-  }
+    }
+
+
+    public async update(id:number, taskUpdate:any):Promise<any>{
+        const task = await this.getTaskById(id);
+
+        task.name = taskUpdate.name ? taskUpdate.name : task.name;
+        task.description = taskUpdate.description ?? task.description;
+        task.priority = taskUpdate.priority ?? task.priority ;
+    }
+
+
+    public delete(id: number): string {
+        const array = this.task.filter(t => t.id != id);
+        this.task = array;
+        return "Task Deleted";
+    }
 }
