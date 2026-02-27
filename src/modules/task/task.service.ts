@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConnectConfig } from 'rxjs';
-import { CreateTaskDto } from 'src/modules/auth/dto/create-task.dto';
+import { CreateTaskDto } from 'src/modules/task/dto/create.task.dto';
+import { UpdateTaskDto } from 'src/modules/task/dto/update.task.dto';
 
 @Injectable()
 export class TaskService {
@@ -19,30 +20,35 @@ export class TaskService {
     }
 
     public async getTaskById(id: number): Promise<any> {
-        const query = 'SELECT * FROM task WHERE id='${ id }'';
+        const query = "SELECT * FROM task WHERE id='${ id }'";
         const [result] = await this.db.query(query)
         return [0]
-
-
     }
 
     public async insert(tasks: CreateTaskDto): Promise<any> {
-          //Agregar el query
-    const sql= 'INSERT INTO tasks VALUES(name, description, priority, user_id)' VALUES ('${task.name}', '${task.description}', '${task.priority}', '${task.id}')
-    const [result]=await this.getTaskById.query(sql);
-    const inserid = result.insertid;
-    const row = await this.getTaskById(insertid):
-    return row;
+        const sql = "INSERT INTO tasks (name, description, priority, user_id)VALUES (${task.name}, ${task.description}, ${task.priority}, ${task.users_id} )"
+        const [result] = await this.db.query(sql);
+        const insertId = result.insertId;
 
+        const row = await this.getTaskById(insertId);
+        return row;
     }
 
-
-    public async update(id:number, taskUpdate:any):Promise<any>{
+    public async update(id: number, taskUpdate: UpdateTaskDto): Promise<any> {
         const task = await this.getTaskById(id);
-
         task.name = taskUpdate.name ? taskUpdate.name : task.name;
-        task.description = taskUpdate.description ?? task.description;
-        task.priority = taskUpdate.priority ?? task.priority ;
+        task.description = task.Update.description ?? task.description;
+        task.priority = task.Update.priority ?? task.priority;
+
+      const query = `
+        UPDATE task 
+        SET name='${task.name}',
+         description='${task.description}',
+          priority=${task.priority}
+           WHERE id=${id}`
+
+        await this.db.query(query);
+        return await this.getTaskById(id);
     }
 
 
