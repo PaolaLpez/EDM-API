@@ -14,6 +14,13 @@ datasource db {
   provider = "mysql"
 }
 
+model Rol{
+  id Int @default(autoincrement()) @id
+  description String @db.VarChar(200)
+  status Boolean
+  users User []
+}
+
 model User {
   id    Int     @default(autoincrement()) @id
   name  String @db.VarChar(200)
@@ -21,6 +28,8 @@ model User {
   userName String @db.VarChar(100)
   password String 
   created_at DateTime @default(now())
+  role_id Int?
+  rol Rol? @relation(fields: [role_id], references: [id])
   tasks Task[]
 }
 
