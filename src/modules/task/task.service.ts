@@ -1,50 +1,61 @@
-import { Injectable } from '@nestjs/common';
-import { CreateTaskDto } from 'src/modules/task/dto/create.task.dto';
-import { UpdateTaskDto } from 'src/modules/task/dto/update.task.dto';
-import { PrismaService } from 'src/prisma.service'; 
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateTaskDto } from './dto/create.task.dto';
 import { Task } from './entities/task.entity';
+import { UpdateTaskDto } from './dto/update.task.dto';
+import { PrismaService } from '../../prisma.service';
 
 @Injectable()
 export class TaskService {
+  constructor(private prisma: PrismaService) {}
 
-    constructor(
-        private prisma: PrismaService 
-    ) { }
+  public async getTasks(userId: number): Promise<Task[]> {
+    const tasks = await this.prisma.task.findMany({
+      where: { user_id: userId }
+    });
 
-    public async getTask(user_id: number): Promise<Task[]> {
-        const tasks = await this.prisma.task.findMany({
-            where: { user_id }
-        });
-        return tasks;
+    console.log(tasks);
+    
+    return tasks;
+  }
+
+  async getTaskById(id: number, userId: number): Promise<Task | null> {
+    const task = await this.prisma.task.findFirst({
+      where: { id, user_id: userId }
+    });
+
+    return task;
+  }
+  
+  async insert(task: CreateTaskDto): Promise<Task> {
+    return await this.prisma.task.create({
+      data: task, 
+    });
+  }
+
+  async update(id: number, userId: number, taskUpdate: UpdateTaskDto): Promise<Task> {
+    const existing = await this.getTaskById(id, userId);
+    if (!existing) {
+      throw new NotFoundException('Task not found or unauthorized');
     }
 
-    public async getTaskById(id: number, user_id: number): Promise<Task> {
-        const task = await this.prisma.task.findUnique({
-            where: { id, user_id }
-        });
-        return task;
+    const task = await this.prisma.task.update({
+      where: { id },
+      data: taskUpdate
+    });
+
+    return task;
+  }
+
+  async delete(id: number, userId: number): Promise<Task> {
+    const existing = await this.getTaskById(id, userId);
+    if (!existing) {
+      throw new NotFoundException('Task not found or unauthorized');
     }
 
-    public async insert(taskData: CreateTaskDto): Promise<Task> {
-        const newTask = await this.prisma.task.create({
-            data: taskData 
-        });
-        return newTask;
-    }
+    const task = await this.prisma.task.delete({
+      where: { id }
+    });
 
- 
-    public async update(id: number, user_id: number, taskUpdate: UpdateTaskDto): Promise<Task> {
-        const task = await this.prisma.task.update({
-            where: { id, user_id: user_id },
-            data: taskUpdate
-        });
-        return task;
-    }
-
-    public async delete(id: number, user_id: number): Promise<Task> { 
-        const task = await this.prisma.task.delete({
-            where: { id, user_id: user_id }
-        });
-        return task;
-    }
+    return task;
+  }
 }

@@ -1,43 +1,62 @@
+import 'dotenv/config';
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AllExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-
+  //Pipe para realizar la validación de forma global
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,              // elimina propiedades no permitidas
-      forbidNonWhitelisted: true,   // lanza error si envían propiedades extra
-      transform: true,              // transforma automáticamente DTOs
+      whitelist: true,
     }),
   );
 
-  //Uso de filtros
   app.useGlobalFilters(new AllExceptionFilter());
-
-  // 📚 Configuración de Swagger
+  //Configuración de swagger
   const config = new DocumentBuilder()
-    .setTitle('API con vulnerabilidades de seguridad')
-    .setDescription('Documentación de la API para pruebas')
+    .setTitle('API con vulnerabilidad de seguridad')
+    .setDescription('Documentación de la api para pruebas')
     .setVersion('1.0.0')
-    .addServer('http://localhost:3000', 'Servidor local')
-    .addServer('https://dominio.com', 'Servidor de producción')
+    .addServer('http://localhost:3000', 'Servidor de pruebas')
+    .addServer('https:dominio.com', 'servidor productivo')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-
-  // Ruta donde estará la documentación
   SwaggerModule.setup('api/docs', app, document);
 
-  const port = process.env.PORT ?? 3000;
-  await app.listen(port);
-
-  console.log(`Servidor corriendo en: http://localhost:${port}`);
-  console.log(`Documentación en: http://localhost:${port}/api/docs`);
+  await app.listen(process.env.PORT ?? 3000);
 }
-
 bootstrap();
+
+//?POSTGRES
+//! npm i pg
+//! npm i @types/pg
+
+//?MYSQL
+//! npm i mysql2
+//! npm i @types/mysql
+
+//! git commit -a -m "fix: Uso de providers (pg, mysql) para conexión a base de datos"
+
+//! npm i @nestjs/swagger
+
+//! git commit -a -m "fix: Correcion del CRUD y uso del swagger"
+
+//! git commit -a -m "fix: Uso de Prisma y corrección de crud"
+
+// npx prisma generate  
+//npx prisma migrate dev --name init
+
+// git commit -a -m "fix: Uso de custom errors, correccion de sesion en CRUD tareas"
+
+//elegir un framework adecuado angular material, react cmd3, tailwind css
+//Utilizar guias de diseño para UX, IX, estandarizar
+//Revisar estructura de codigo, logica, bien segmentado, utilizar template,
+//de forma abstracta y de calidad
+
+
+// git commit -a -m "bug: Corrección de auth y creación de rutas (refresh,logout) "

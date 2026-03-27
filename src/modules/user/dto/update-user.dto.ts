@@ -1,23 +1,30 @@
-import { IsBoolean, IsInt, IsNotEmpty, IsNumber, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsOptional, IsString, MaxLength, MinLength, IsInt } from 'class-validator';
+
 export class UpdateUserDto {
+  @IsOptional()
+  @IsString({ message: 'El nombre es requerido' })
+  @MaxLength(100)
+  @MinLength(3)
+  name?: string;
 
-    @IsNotEmpty()
-    @IsString({ message: 'nombre es requerido' })
-    @MaxLength(100)
-    @MinLength(3)
-    name: string;
+  @IsOptional()
+  @IsString({ message: 'El apellido es requerido' })
+  @MaxLength(250)
+  @MinLength(3)
+  lastname?: string;
 
-    @IsNotEmpty()
-    @IsString({ message: 'nombre es requerido' })
-    @MaxLength(250)
-    @MinLength(3)
-    description: string;
+  @IsOptional()
+  @IsString({ message: 'El username es requerido' })
+  @MaxLength(100)
+  @MinLength(3)
+  username?: string;
 
-    @IsNotEmpty()
-    @IsBoolean()
-    priority: boolean;
+  @IsOptional()
+  @IsString({ message: 'La contraseña es requerida' })
+  @MinLength(6)
+  password?: string;
 
-    @IsNumber()
-    @IsInt()
-    user_id: number;
+  @IsOptional()
+  @IsInt()
+  role_id?: number;
 }
