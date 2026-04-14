@@ -1,4 +1,4 @@
-import { IsBoolean, IsInt, IsNotEmpty, IsNumber, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsBoolean, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 export class UpdateTaskDto {
 
     @IsNotEmpty()
@@ -17,6 +17,7 @@ export class UpdateTaskDto {
     @IsBoolean()
     priority: boolean;
 
+    @IsOptional()
     @IsNumber()
     @IsInt()
     user_id: number;

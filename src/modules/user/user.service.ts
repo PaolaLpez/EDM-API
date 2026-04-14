@@ -17,16 +17,17 @@ export class UserService {
         name: true,
         lastName: true,        // Prisma usa lastName
         userName: true,        // Prisma usa userName
-        created_at: true
+        created_at: true,
+        role_id: true
       }
     });
     
-    // Mapear la respuesta para que coincida con tu DTO (opcional)
+    // Mapear la respuesta para que coincida con tu DTO 
     return users.map(user => ({
       id: user.id,
       name: user.name,
-      lastname: user.lastName,  // Convertir lastName -> lastname
-      username: user.userName,  // Convertir userName -> username
+      lastname: user.lastName,  
+      username: user.userName,  
       created_at: user.created_at
     }));
   }
@@ -72,8 +73,8 @@ export class UserService {
       // Mapear de DTO (snake_case) a Prisma (camelCase)
       const userData = {
         name: user.name,
-        lastName: user.lastname,    // Mapeo: lastname -> lastName
-        userName: user.username,    // Mapeo: username -> userName
+        lastName: user.lastname,    
+        userName: user.username,    
         password: user.password,
         created_at: new Date(),
       };

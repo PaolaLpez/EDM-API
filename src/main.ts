@@ -4,19 +4,30 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AllExceptionFilter } from './common/filters/http-exception.filter';
+import { LogsService } from './common/services/logs.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  //Pipe para realizar la validación de forma global
+  app.enableCors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  });
+  
+  // Pipe para validación global
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
     }),
   );
 
-  app.useGlobalFilters(new AllExceptionFilter());
-  //Configuración de swagger
+  // 🔥 AGREGADO: obtener LogsService sin romper estructura
+  const logsService = app.get(LogsService);
+
+  // 🔥 AGREGADO: filtro global con logs
+  app.useGlobalFilters(new AllExceptionFilter(logsService));
+
+  // Swagger config (SIN CAMBIOS)
   const config = new DocumentBuilder()
     .setTitle('API con vulnerabilidad de seguridad')
     .setDescription('Documentación de la api para pruebas')
@@ -31,6 +42,7 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
+
 
 //?POSTGRES
 //! npm i pg
@@ -57,6 +69,5 @@ bootstrap();
 //Utilizar guias de diseño para UX, IX, estandarizar
 //Revisar estructura de codigo, logica, bien segmentado, utilizar template,
 //de forma abstracta y de calidad
-
 
 // git commit -a -m "bug: Corrección de auth y creación de rutas (refresh,logout) "

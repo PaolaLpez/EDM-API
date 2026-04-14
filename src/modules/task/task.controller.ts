@@ -62,7 +62,7 @@ export class TaskController {
     @Body() task: CreateTaskDto,
     @Req() req: any
   ): Promise<Task> {
-    task.user_id = req.user.id;
+    task.user_id = Number(req.user.id);
     const result = await this.taskSvc.insert(task);
 
     if (result == undefined) {
