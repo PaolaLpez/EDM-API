@@ -5,26 +5,46 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AllExceptionFilter } from './common/filters/http-exception.filter';
 import { LogsService } from './common/services/logs.service';
+import helmet from 'helmet';
+import * as bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Seguridad headers
+ app.use(
+  helmet({
+    crossOriginResourcePolicy: false, // evita problemas con frontend
+  }),
+);
+
+  app.use(cookieParser());
+
+  // Limitar tamaño de requests
+  app.use(bodyParser.json({ limit: '1mb' }));
+
+  // CORS seguro
   app.enableCors({
-    origin: 'http://localhost:5173',
-    credentials: true,
+  origin: 'http://localhost:5173',
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   });
   
   // Pipe para validación global
   app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-    }),
-  );
+  new ValidationPipe({
+    whitelist: true,
+    forbidNonWhitelisted: true, // bloquea campos extra
+    transform: true, // convierte tipos automáticamente
+  }),
+);
 
-  // 🔥 AGREGADO: obtener LogsService sin romper estructura
+  // AGREGADO: obtener LogsService sin romper estructura
   const logsService = app.get(LogsService);
 
-  // 🔥 AGREGADO: filtro global con logs
+  // AGREGADO: filtro global con logs
   app.useGlobalFilters(new AllExceptionFilter(logsService));
 
   // Swagger config (SIN CAMBIOS)

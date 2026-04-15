@@ -8,4 +8,6 @@ import { LogsModule } from './common/logs/logs.module';
   controllers: [],                    
   providers: [],                  
 })
+
+
 export class AppModule {}

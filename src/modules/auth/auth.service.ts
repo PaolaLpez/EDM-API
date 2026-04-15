@@ -184,7 +184,7 @@ export class AuthService {
     };
   }
 
-  // 🔥 FORGOT PASSWORD (CORREGIDO)
+  // FORGOT PASSWORD 
   async forgotPassword(userName: string) {
     const user = await this.prisma.user.findFirst({
       where: { userName }
@@ -199,7 +199,7 @@ export class AuthService {
       { expiresIn: '15m' }
     );
 
-    // 🔥 HASH REAL
+   
     const hash = await bcrypt.hash(token, 10);
 
     await this.prisma.user.update({
@@ -209,11 +209,11 @@ export class AuthService {
 
     return {
       message: 'Token generado',
-      token // 👈 solo para pruebas/Postman
+      token
     };
   }
 
-  // 🔥 RESET PASSWORD (CORREGIDO)
+  // RESET PASSWORD 
   async resetPassword(token: string, newPassword: string) {
     try {
       const payload = this.jwtService.verify(token) as any;
@@ -226,7 +226,7 @@ export class AuthService {
         throw new UnauthorizedException('Token inválido');
       }
 
-      // 🔥 comparar correctamente
+
       const isValid = await bcrypt.compare(token, user.hash);
 
       if (!isValid) {
@@ -239,7 +239,7 @@ export class AuthService {
         where: { id: user.id },
         data: {
           password: hashedPassword,
-          hash: null // 🔥 limpiar después de usar
+          hash: null 
         }
       });
 
